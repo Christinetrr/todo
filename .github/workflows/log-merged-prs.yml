@@ -6,12 +6,14 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
 
 jobs:
   append-readme-log:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    concurrency:
+      group: readme-pr-log-${{ github.event.pull_request.base.ref }}
+      cancel-in-progress: false
     steps:
       - name: Checkout base branch (merge target)
         uses: actions/checkout@v4
@@ -27,19 +29,6 @@ jobs:
           script: |
             const fs = require('fs')
             const pr = context.payload.pull_request
-
-            const reviews = await github.paginate(github.rest.pulls.listReviews, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number,
-              per_page: 100,
-            })
-
-            const approved = reviews.some((r) => r.state === 'APPROVED')
-            if (!approved) {
-              core.info('Skipping README log: no APPROVED review on this PR.')
-              return
-            }
 
             const author = pr.user.login
             const mergedAt = pr.merged_at
