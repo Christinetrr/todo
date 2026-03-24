@@ -1,33 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Todo } from '../types'
-
-const STORAGE_KEY = 'todo-app-tasks'
-
-function parseTodos(raw: string | null): Todo[] {
-  if (!raw) return []
-  try {
-    const data = JSON.parse(raw) as unknown
-    if (!Array.isArray(data)) return []
-    return data.filter(isTodo)
-  } catch {
-    return []
-  }
-}
-
-function isTodo(x: unknown): x is Todo {
-  if (x === null || typeof x !== 'object') return false
-  const o = x as Record<string, unknown>
-  return (
-    typeof o.id === 'string' &&
-    typeof o.text === 'string' &&
-    typeof o.completed === 'boolean' &&
-    typeof o.createdAt === 'number'
-  )
-}
+import { parseTodosFromStorage, STORAGE_KEY } from '../lib/todoStorage'
 
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>(() =>
-    parseTodos(
+    parseTodosFromStorage(
       typeof localStorage !== 'undefined'
         ? localStorage.getItem(STORAGE_KEY)
         : null,

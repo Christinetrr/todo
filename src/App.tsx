@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTodos } from './hooks/useTodos'
+import { countActive, countCompleted, filterTodos } from './lib/todoFilters'
+import { formatTasksLeftLabel, getEmptyListMessage } from './lib/todoCopy'
 import type { TodoFilter } from './types'
 import './App.css'
 
@@ -9,18 +11,14 @@ function App() {
   const [draft, setDraft] = useState('')
   const [filter, setFilter] = useState<TodoFilter>('all')
 
-  const filtered = useMemo(() => {
-    if (filter === 'active') return todos.filter((t) => !t.completed)
-    if (filter === 'completed') return todos.filter((t) => t.completed)
-    return todos
-  }, [todos, filter])
-
-  const activeCount = useMemo(
-    () => todos.filter((t) => !t.completed).length,
-    [todos],
+  const filtered = useMemo(
+    () => filterTodos(todos, filter),
+    [todos, filter],
   )
 
-  const completedCount = todos.length - activeCount
+  const activeCount = useMemo(() => countActive(todos), [todos])
+
+  const completedCount = countCompleted(todos)
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -76,13 +74,7 @@ function App() {
 
       {filtered.length === 0 ? (
         <p className="empty">
-          {todos.length === 0
-            ? 'No tasks yet. Add one above.'
-            : filter === 'active'
-              ? 'Nothing left to do — nice.'
-              : filter === 'completed'
-                ? 'No completed tasks yet.'
-                : 'No tasks match this filter.'}
+          {getEmptyListMessage(todos.length, filter)}
         </p>
       ) : (
         <ul className="list">
@@ -114,9 +106,7 @@ function App() {
 
       {todos.length > 0 && (
         <footer className="footer">
-          <span className="meta">
-            {activeCount === 1 ? '1 task left' : `${activeCount} tasks left`}
-          </span>
+          <span className="meta">{formatTasksLeftLabel(activeCount)}</span>
           {completedCount > 0 && (
             <button type="button" className="btn link" onClick={clearCompleted}>
               Clear completed
