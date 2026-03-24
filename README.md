@@ -71,3 +71,7 @@ export default defineConfig([
   },
 ])
 ```
+
+## Merged pull requests
+
+- @Christinetrr — 2026-03-24 — change color (#3)
