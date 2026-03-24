@@ -75,3 +75,4 @@ export default defineConfig([
 ## Merged pull requests
 
 - @Christinetrr — 2026-03-24 — change color (#3)
+- @zhanwen22 — 2026-03-24 — changed colors to pink (#4)
