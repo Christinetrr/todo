@@ -1,13 +1,26 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTodos } from './hooks/useTodos'
 import type { TodoFilter } from './types'
 import './App.css'
 
+const FILTER_STORAGE_KEY = 'todo-app-filter'
+
+function readStoredFilter(): TodoFilter {
+  if (typeof localStorage === 'undefined') return 'all'
+  const raw = localStorage.getItem(FILTER_STORAGE_KEY)
+  if (raw === 'active' || raw === 'completed' || raw === 'all') return raw
+  return 'all'
+}
+
 function App() {
   const { todos, addTodo, toggleTodo, deleteTodo, clearCompleted } = useTodos()
   const [draft, setDraft] = useState('')
-  const [filter, setFilter] = useState<TodoFilter>('all')
+  const [filter, setFilter] = useState<TodoFilter>(readStoredFilter)
+
+  useEffect(() => {
+    localStorage.setItem(FILTER_STORAGE_KEY, filter)
+  }, [filter])
 
   const filtered = useMemo(() => {
     if (filter === 'active') return todos.filter((t) => !t.completed)
