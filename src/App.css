@@ -78,6 +78,16 @@
   background: var(--accent-hover);
 }
 
+@media (prefers-color-scheme: dark) {
+  .btn.primary {
+    color: #042f2a;
+  }
+
+  .btn.primary:not(:disabled):hover {
+    color: #021916;
+  }
+}
+
 .btn.ghost {
   background: transparent;
   color: var(--text-muted);
